@@ -1,5 +1,5 @@
-set (quake_resource_libdir ${CMAKE_INSTALL_PREFIX}/lib/quake2sdl)
-set (quake_resource_datadir ${CMAKE_INSTALL_PREFIX}/share/quake2)
+set (quake_resource_libdir /usr/local/lib/quake2sdl)
+set (quake_resource_datadir /usr/local/share/quake2)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/q_resources.h.in ${CMAKE_CURRENT_BINARY_DIR}/q_resources.h)
 
 include_directories (${SDL2_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
@@ -133,7 +133,7 @@ add_library (game-base SHARED
   game/p_weapon.c
   game/q_shared.c
   game/m_flash.c)
-set_target_properties (game-base PROPERTIES OUTPUT_NAME game PREFIX "")
+set_target_properties (game-base PROPERTIES OUTPUT_NAME gamei386 PREFIX "")
 
 install (TARGETS quake2 RUNTIME DESTINATION bin)
 install (TARGETS ref-softsdl LIBRARY DESTINATION lib/quake2sdl)
