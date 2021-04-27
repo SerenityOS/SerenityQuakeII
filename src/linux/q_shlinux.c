@@ -97,11 +97,13 @@ int Hunk_End (void)
     n = munmap(unmap_base, unmap_len) + membase;
   }
 #endif
-#if defined(__linux__)
-    n = mremap(membase, maxhunksize, curhunksize + sizeof(int), 0);
+// HACK: This code crashes Quake2 on launch in Serenity. 
+// It works just fine without it, but this should _definitely_ be implemented eventually.
+#if defined(__linux__) || defined(__serenity__)
+    //n = mremap(membase, maxhunksize, curhunksize + sizeof(int), 0);
 #endif
-    if (n != membase)
-        Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
+    //if (n != membase)
+        //Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
     *((int *)membase) = curhunksize + sizeof(int);
     
     return curhunksize;

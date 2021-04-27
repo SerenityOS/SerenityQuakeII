@@ -140,12 +140,12 @@ typedef struct vidmode_s
 
 vidmode_t vid_modes[] =
 {
-    { "Mode 0: 320x240",   320, 240,   0 },
+    { "Mode 0: 320x240",   640, 480,   0 }, // HACK: Trying to access graphics options or setting video mode kills the program.
     { "Mode 1: 400x300",   400, 300,   1 },
     { "Mode 2: 512x384",   512, 384,   2 },
     { "Mode 3: 640x480",   640, 480,   3 },
     { "Mode 4: 800x600",   800, 600,   4 },
-    { "Mode 5: 960x720",   960, 720,   5 },
+    { "Mode 5: 960x720",   960, 3720,   5 },
     { "Mode 6: 1024x768",  1024, 768,  6 },
     { "Mode 7: 1152x864",  1152, 864,  7 },
     { "Mode 8: 1280x1024",  1280, 1024, 8 },
@@ -239,8 +239,11 @@ qboolean VID_LoadRefresh( char *name )
     //regain root
     seteuid(saved_euid);
 
-    snprintf (fn, MAX_OSPATH, "%s/%s", RESOURCE_LIBDIR, name );
-    
+    // FIXME: RESOURCE_LIBDIR is a completely invalid path!
+    // Un-hardcode me eventually please!
+    //snprintf (fn, MAX_OSPATH, "%s/%s", RESOURCE_LIBDIR, name );
+    snprintf (fn, MAX_OSPATH, "%s/%s", "/usr/local/lib/quake2sdl", name );
+    Com_Printf("%s\n", fn);
     if (stat(fn, &st) == -1) {
         Com_Printf( "LoadLibrary(\"%s\") failed: %s\n", name, strerror(errno));
         return false;

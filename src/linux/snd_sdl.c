@@ -2,7 +2,7 @@
     snd_sdl.c
 
     Sound code taken from SDLQuake and modified to work with Quake2
-    Robert Bäuml 2001-12-25
+    Robert Bï¿½uml 2001-12-25
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
     $Id: snd_sdl.c,v 1.2 2002/02/09 20:29:38 relnev Exp $
 */
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "../client/client.h"
 #include "../client/snd_loc.h"
