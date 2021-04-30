@@ -76,34 +76,36 @@ void *Hunk_Alloc (int size)
     return buf;
 }
 
+
+// FIXME: 64-bit????
+#define PAGE_SIZE 4096
+
 int Hunk_End (void)
 {
     byte *n;
 
-#if defined(__FreeBSD__)
-  size_t old_size = maxhunksize;
-  size_t new_size = curhunksize + sizeof(int);
-  void * unmap_base;
-  size_t unmap_len;
+#if defined(__FreeBSD__) || defined(__serenity__)
+    size_t old_size = maxhunksize;
+    size_t new_size = curhunksize + sizeof(int);
+    void * unmap_base;
+    size_t unmap_len;
 
-  new_size = round_page(new_size);
-  old_size = round_page(old_size);
-  if (new_size > old_size)
-      n = 0; /* error */
-  else if (new_size < old_size)
-  {
-    unmap_base = (caddr_t)(membase + new_size);
-    unmap_len = old_size - new_size;
-    n = munmap(unmap_base, unmap_len) + membase;
-  }
+    new_size = ((new_size + PAGE_SIZE - 1) & (~(PAGE_SIZE - 1)));
+    old_size = ((old_size + PAGE_SIZE - 1) & (~(PAGE_SIZE - 1)));
+    if (new_size > old_size)
+        n = 0; /* error */
+    else if (new_size < old_size)
+    {
+        unmap_base = (caddr_t)(membase + new_size);
+        unmap_len = old_size - new_size;
+        n = munmap(unmap_base, unmap_len) + membase;
+    }
 #endif
-// HACK: This code crashes Quake2 on launch in Serenity. 
-// It works just fine without it, but this should _definitely_ be implemented eventually.
-#if defined(__linux__) || defined(__serenity__)
-    //n = mremap(membase, maxhunksize, curhunksize + sizeof(int), 0);
+#if defined(__linux__)
+    n = mremap(membase, maxhunksize, curhunksize + sizeof(int), 0);
 #endif
-    //if (n != membase)
-        //Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
+    if (n != membase)
+        Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
     *((int *)membase) = curhunksize + sizeof(int);
     
     return curhunksize;
