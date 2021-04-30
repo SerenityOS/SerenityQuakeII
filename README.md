@@ -26,20 +26,7 @@ TODO:
 Building and installation
 -------------------------
 
-To build **Quake2 SDL** install SDL2, OpenGL  and jpeg libraries, then
-run the following commands:
-````
-mkdir build
-cd build
-cmake ..
-make
-make install
-````
+Build like a regular Serenity Port.
+In the `quake2` port directory, run `./package.sh`.
 
-You can pass `-DWITH_QMAX=ON` option to cmake to build an improved
-OpenGL renderer or `-DWITH_RETEX=ON` to allow retexture packs. You
-will need to download these packs from
-[icculus](http://offload1.icculus.org/quake2/files/) site (download
-`.pak` files). You will also need `pak0.pak` from the original
-game. Place these files where `game.so` is installed or to
-`/install/prefix/share/quake2/baseq2`.
+You'll then need to source the QuakeII demo pak file yourself. iD's FTP is offline, however you can find the demo in a few places. Once you've downloaded the demo, move the `pak0.pak` file to `/home/anon/.quake2/baseq2/` and run `quake2` from the command line. 
