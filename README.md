@@ -30,3 +30,14 @@ Build like a regular Serenity Port.
 In the `quake2` port directory, run `./package.sh`.
 
 You'll then need to source the QuakeII demo pak file yourself. iD's FTP is offline, however you can find the demo in a few places. Once you've downloaded the demo, move the `pak0.pak` file to `/home/anon/.quake2/baseq2/` and run `quake2` from the command line. 
+
+Running with OpenGL
+-------------------
+
+Dynamically switching between software rendering and LibGL does not yet work; to run Quake2 in OpenGL mode, add the
+following statements to `~/.quake2/baseq2/config.cfg`:
+
+```
+set vid_ref "sdlgl"
+set gl_driver "libgl.so.serenity"
+```

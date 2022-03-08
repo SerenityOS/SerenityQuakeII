@@ -1,8 +1,8 @@
-set (quake_resource_libdir /usr/local/lib/quake2sdl)
-set (quake_resource_datadir /usr/local/share/quake2)
+set (quake_resource_libdir ${CMAKE_INSTALL_PREFIX}/lib/quake2sdl)
+set (quake_resource_datadir ${CMAKE_INSTALL_PREFIX}/share/quake2)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/q_resources.h.in ${CMAKE_CURRENT_BINARY_DIR}/q_resources.h)
 
-include_directories (${SDL2_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories (${SDL2_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${OPENGL_INCLUDE_DIR})
 
 set (Q2_SOURCES
   client/cl_cin.c
@@ -84,6 +84,36 @@ add_library (ref-softsdl SHARED
   )
 set_target_properties (ref-softsdl PROPERTIES OUTPUT_NAME ref_softsdl PREFIX "")
 
+if (WITH_QMAX)
+    set (GL_DIR ref_candygl)
+else (WITH_QMAX)
+    set (GL_DIR ref_gl)
+endif (WITH_QMAX)
+
+add_library (ref-sdlgl SHARED
+        ${GL_DIR}/gl_draw.c
+        ${GL_DIR}/gl_image.c
+        ${GL_DIR}/gl_light.c
+        ${GL_DIR}/gl_mesh.c
+        ${GL_DIR}/gl_model.c
+        ${GL_DIR}/gl_rmain.c
+        ${GL_DIR}/gl_rmisc.c
+        ${GL_DIR}/gl_rsurf.c
+        ${GL_DIR}/gl_warp.c
+        linux/qgl_linux.c
+        game/q_shared.c
+        linux/q_shlinux.c
+        linux/glob.c
+        linux/rw_sdl.c
+        linux/rw_linux.c
+        linux/joystick.c
+        )
+if (WITH_QMAX)
+    target_link_libraries (ref-sdlgl ${JPEG_LIBRARY})
+endif (WITH_QMAX)
+target_compile_definitions (ref-sdlgl PRIVATE -DOPENGL)
+set_target_properties (ref-sdlgl PROPERTIES OUTPUT_NAME ref_sdlgl PREFIX "")
+
 add_library (game-base SHARED
   game/g_ai.c
   game/p_client.c
@@ -133,8 +163,8 @@ add_library (game-base SHARED
   game/p_weapon.c
   game/q_shared.c
   game/m_flash.c)
-set_target_properties (game-base PROPERTIES OUTPUT_NAME gamei386 PREFIX "")
+set_target_properties (game-base PROPERTIES OUTPUT_NAME game PREFIX "")
 
 install (TARGETS quake2 RUNTIME DESTINATION bin)
-install (TARGETS ref-softsdl LIBRARY DESTINATION lib/quake2sdl)
+install (TARGETS ref-softsdl ref-sdlgl LIBRARY DESTINATION lib/quake2sdl)
 install (TARGETS game-base LIBRARY DESTINATION lib/quake2sdl/baseq2)
