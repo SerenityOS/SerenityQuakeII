@@ -207,94 +207,69 @@ Loads the game dll
 */
 void *Sys_GetGameAPI (void *parms)
 {
-	void	*(*GetGameAPI) (void *);
-	
-	FILE	*fp;
-	char	name[MAX_OSPATH];
-	char	*path;
-	char	*str_p;
-#if defined __i386__
-	const char *gamename = "gamei386.so";
-#elif defined __x86_64__
-	const char *gamename = "gamex86_64.so";
-#elif defined __alpha__
-	const char *gamename = "gameaxp.so";
-#elif defined __powerpc__
-	const char *gamename = "gameppc.so";
-#elif defined __sparc__
-	const char *gamename = "gamesparc.so";
-#elif defined __gcw__
-	const char *gamename = "gamegcw.so";
-#else
-	const char *gamename = "gamegcw.so";
-#endif
+    void    *(*GetGameAPI) (void *);
 
-	setreuid(getuid(), getuid());
-	setegid(getgid());
+    FILE    *fp;
+    char    name[MAX_OSPATH];
+    char    *path;
+    char    *str_p;
+    const char *gamename = "game.so";
 
-	if (game_library)
-		Com_Error (ERR_FATAL, "Sys_GetGameAPI without Sys_UnloadingGame");
+    setreuid(getuid(), getuid());
+    setegid(getgid());
 
-	Com_Printf("------- Loading %s -------\n", gamename);
+    if (game_library)
+        Com_Error (ERR_FATAL, "Sys_GetGameAPI without Sys_UnloadingGame");
 
-	// now run through the search paths
-	path = NULL;
-	while (1)
-	{
-		path = FS_NextPath (path);
-		if (!path)
-		{
-			snprintf(name, MAX_OSPATH, "%s/%s", getenv("PWD"), gamename);
+    Com_Printf("------- Loading %s -------\n", gamename);
 
-			printf("%s\n" ,name);
-			fp = fopen(name, "rb");
-			if (fp == NULL)
-				return NULL;		// couldn't find one anywhere
-			fclose(fp);	
-		}
-		else
-		{
-			snprintf (name, MAX_OSPATH, "%s/%s", path, gamename);
+    // now run through the search paths
+    path = NULL;
+    while (1)
+    {
+        path = FS_NextPath (path);
+        if (!path)
+            return NULL;        // couldn't find one anywhere
+        snprintf (name, MAX_OSPATH, "%s/%s", path, gamename);
 
-			/* skip it if it just doesn't exist */
-			fp = fopen(name, "rb");
-			if (fp == NULL)
-				continue;
-			fclose(fp);
-		}
-		
-		game_library = dlopen (name, RTLD_NOW);
-		if (game_library)
-		{
-			Com_MDPrintf ("LoadLibrary (%s)\n",name);
-			break;
-		} 
-		else 
-		{
-			Com_Printf ("LoadLibrary (%s):", name);
-			
-			path = dlerror();
-			str_p = strchr(path, ':'); // skip the path (already shown)
-			if (str_p == NULL)
-				str_p = path;
-			else
-				str_p++;
-				
-			Com_Printf ("%s\n", str_p);
-			
-			return NULL; 
-		}
-	}
+        /* skip it if it just doesn't exist */
+        fp = fopen(name, "rb");
+        if (fp == NULL)
+            continue;
+        fclose(fp);
 
-	GetGameAPI = (void *)dlsym (game_library, "GetGameAPI");
+        game_library = dlopen (name, RTLD_NOW);
+        if (game_library)
+        {
+            Com_MDPrintf ("LoadLibrary (%s)\n",name);
+            break;
+        }
+        else
+        {
+            Com_Printf ("LoadLibrary (%s):", name);
 
-	if (!GetGameAPI)
-	{
-		Sys_UnloadGame ();		
-		return NULL;
-	}
+            path = dlerror();
+            str_p = strchr(path, ':'); // skip the path (already shown)
+            if (str_p == NULL)
+                str_p = path;
+            else
+                str_p++;
 
-	return GetGameAPI (parms);
+            Com_Printf ("%s\n", str_p);
+
+            return NULL;
+        }
+    }
+
+    GetGameAPI = (void *)dlsym (game_library, "GetGameAPI");
+
+    if (!GetGameAPI)
+    {
+        Sys_UnloadGame ();
+        return NULL;
+    }
+
+    return GetGameAPI (parms);
 }
 
 /*****************************************************************************/
